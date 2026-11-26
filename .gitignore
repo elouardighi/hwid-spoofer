@@ -1,0 +1,22 @@
+# --- Rust build artifacts ---
+/target/
+**/*.rs.bk
+
+# --- Node / Electron ---
+node_modules/
+electron-app/dist/
+electron-app/dist_new/
+electron-app/dist_final/
+
+# --- Logs & runtime data ---
+*.log
+overrides.json
+
+# --- Environment / secrets ---
+.env
+.env.*
+
+# --- OS junk ---
+Thumbs.db
+.DS_Store
+desktop.ini

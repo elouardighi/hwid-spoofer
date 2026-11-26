@@ -1,0 +1,23 @@
+[package]
+name = "hwid_spoofer"
+version = "1.0.1"
+edition = "2021"
+description = "Windows HWID Spoofer - Randomizes hardware identifiers to present a new machine profile"
+
+[[bin]]
+name = "hwid_spoofer_v2"
+path = "src/main.rs"
+
+[dependencies]
+winreg = "0.10"
+uuid = { version = "1.0", features = ["v4"] }
+rand = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+hex = "0.4"
+chrono = "0.4"
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HYPERVOID | HWID Spoofer</title>
+    <meta name="description" content="Premium Windows HWID Spoofer. Randomize BIOS UUID, SMBIOS serials, disk serials, MAC addresses and USB serials. Jump back into online games with a fresh identity.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+    <style>
+        :root {
+            --bg: #05070d;
+            --bg2: #0a0e18;
+            --panel: #0d1220;
+            --border: #1c2740;
+            --neon: #00f0ff;
+            --neon2: #b14bff;
+            --text: #e8eefc;
+            --muted: #8b98b4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .bg-grid {
+            position: fixed; inset: 0; z-index: -2;
+            background:
+                linear-gradient(rgba(0,240,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,240,255,0.04) 1px, transparent 1px),
+                var(--bg);
+            background-size: 44px 44px;
+        }
+        .bg-glow {
+            position: fixed; z-index: -1; border-radius: 50%; filter: blur(140px); opacity: 0.16;
+            background: var(--neon); width: 500px; height: 500px; top: -160px; left: -160px;
+        }
+        .bg-glow2 {
+            position: fixed; z: -1; border-radius: 50%; filter: blur(140px); opacity: 0.12;
+            background: var(--neon2); width: 560px; height: 560px; top: 30%; right: -220px;
+        }
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 22px clamp(20px, 6vw, 72px);
+            border-bottom: 1px solid rgba(28,39,64,0.6);
+            position: sticky; top: 0; backdrop-filter: blur(10px);
+            background: rgba(5,7,13,0.75); z-index: 50;
+        }
+        .logo {
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 20px;
+            letter-spacing: 4px; color: var(--text); text-decoration: none;
+        }
+        .logo span { color: var(--neon); }
+        nav { display: flex; gap: 28px; }
+        nav a { color: var(--muted); text-decoration: none; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; transition: 0.2s; }
+        nav a:hover { color: var(--neon); }
+        @media (max-width: 720px) { nav { display: none; } }
+        main { position: relative; }
+        .hero {
+            text-align: center; padding: clamp(70px, 12vw, 140px) 20px clamp(50px, 8vw, 90px);
+        }
+        .badge {
+            display: inline-block; border: 1px solid var(--neon); color: var(--neon);
+            padding: 7px 18px; border-radius: 100px; font-size: 12px; letter-spacing: 2.5px;
+            text-transform: uppercase; margin-bottom: 28px; background: rgba(0,240,255,0.06);
+        }
+        h1 {
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: clamp(38px, 8vw, 84px);
+            line-height: 1.05; text-transform: uppercase; letter-spacing: 2px;
+        }
+        h1 .grad {
+            background: linear-gradient(90deg, var(--neon), var(--neon2));
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .sub { color: var(--muted); font-size: clamp(15px, 2.2vw, 19px); max-width: 620px; margin: 26px auto 0; line-height: 1.7; }
+        .cta-row { display: flex; gap: 16px; justify-content: center; margin-top: 42px; flex-wrap: wrap; }
+        .btn {
+            display: inline-block; padding: 17px 42px; border-radius: 6px; text-decoration: none;
+            font-family: 'Inter', sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 1px;
+            text-transform: uppercase; transition: 0.2s; border: 1px solid transparent; cursor: pointer;
+        }
+        .btn-primary { background: linear-gradient(90deg, var(--neon), #00c8dd); color: #02141a; }
+        .btn-primary:hover { box-shadow: 0 0 34px rgba(0,240,255,0.55); transform: translateY(-2px); }
+        .btn-ghost { border-color: var(--border); color: var(--text); background: transparent; }
+        .btn-ghost:hover { border-color: var(--neon); color: var(--neon); }
+        .stats { display: flex; justify-content: center; gap: clamp(24px, 6vw, 80px); padding: 40px 20px; flex-wrap: wrap; }
+        .stat { text-align: center; }
+        .stat b { display: block; font-family: 'Orbitron', sans-serif; font-size: clamp(24px, 4vw, 40px); color: var(--neon); }
+        .stat span { color: var(--muted); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+        section { padding: clamp(50px, 8vw, 100px) clamp(20px, 6vw, 72px); max-width: 1200px; margin: 0 auto; }
+        .sec-title { font-family: 'Orbitron', sans-serif; font-size: clamp(26px, 4.5vw, 44px); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+        .sec-title em { font-style: normal; background: linear-gradient(90deg, var(--neon), var(--neon2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .sec-sub { color: var(--muted); margin-bottom: 44px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+        .card {
+            background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 28px;
+            transition: 0.25s;
+        }
+        .card:hover { border-color: var(--neon); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,240,255,0.08); }
+        .card .ico { font-size: 30px; margin-bottom: 16px; }
+        .card h3 { font-size: 16px; letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; font-family: 'Orbitron', sans-serif; font-weight: 700; }
+        .card p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+        .pricing { text-align: center; background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: clamp(36px, 6vw, 70px) clamp(20px, 5vw, 60px); max-width: 640px; margin: 0 auto; }
+        .price { font-family: 'Orbitron', sans-serif; font-size: clamp(56px, 9vw, 90px); font-weight: 900; color: var(--text); }
+        .price small { font-size: 20px; color: var(--muted); font-family: 'Inter', sans-serif; font-weight: 400; }
+        .per { color: var(--muted); font-size: 13px; margin-top: 6px; margin-bottom: 30px; letter-spacing: 1px; }
+        .features-list { list-style: none; margin: 0 auto 34px; max-width: 380px; text-align: left; }
+        .features-list li { color: var(--muted); font-size: 14px; padding: 7px 0 7px 30px; position: relative; }
+        .features-list li::before { content: '✔'; position: absolute; left: 0; color: var(--neon); }
+        .btn-buy { background: linear-gradient(90deg, var(--neon2), #8a3bff); color: #12041f; font-size: 16px; padding: 19px 56px; }
+        .btn-buy:hover { box-shadow: 0 0 44px rgba(177,75,255,0.6); transform: translateY(-2px); }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; counter-reset: step; }
+        .step { border: 1px solid var(--border); background: var(--panel); border-radius: 10px; padding: 30px 24px; position: relative; }
+        .step::before {
+            counter-increment: step; content: counter(step, decimal-leading-zero);
+            font-family: 'Orbitron', sans-serif; color: var(--neon); font-size: 15px; letter-spacing: 2px;
+        }
+        .step h3 { font-family: 'Orbitron', sans-serif; font-size: 15px; text-transform: uppercase; margin: 16px 0 8px; }
+        .step p { color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+        footer { border-top: 1px solid var(--border); padding: 34px 20px; text-align: center; color: var(--muted); font-size: 13px; }
+        footer b { color: var(--text); }
+        .note { margin-top: 26px; font-size: 12px; color: var(--muted); letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow2"></div>
+
+    <header>
+        <a class="logo">HYPER<span>VOID</span></a>
+        <nav>
+            <a href="#features">Features</a>
+            <a href="#how">How</a>
+            <a href="#buy">Buy</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="badge">Windows · v10 Pro / v11</div>
+            <h1>YOUR DIGITAL<br>IDENTITY,<br><span class="grad">REBORN</span></h1>
+            <p class="sub">One-click HWID spoofing for Windows. Randomize BIOS UUID, SMBIOS serials, disk serials, MAC addresses and USB identifiers in seconds — built for gamers who refuse to get banned.</p>
+            <div class="cta-row">
+                <a href="#buy" class="btn btn-primary">Get Access — $10</a>
+                <a href="#features" class="btn btn-ghost">View Features</a>
+            </div>
+        </section>
+
+        <div class="stats">
+            <div class="stat"><b>100%</b><span>Real Hardware</span></div>
+            <div class="stat"><b>6+</b><span>ID Spoofed</span></div>
+            <div class="stat"><b>⚡</b><span>Instant Setup</span></div>
+            <div class="stat"><b>∞</b><span>Free Updates</span></div>
+        </div>
+
+        <section id="features">
+            <h2 class="sec-title">BUILT FOR <em>DISCORD</em> &amp; <em>CALL OF DUTY</em> FARMERS</h2>
+            <p class="sec-sub">Everything you need to walk back into the fight with a clean slate.</p>
+            <div class="grid">
+                <div class="card">
+                    <div class="ico">⌨️</div>
+                    <h3>BIOS / UEFI UUID</h3>
+                    <p>Randomized motherboard GUID on every fresh install. No more reusing the same hash across clan farms.</p>
+                </div>
+                <div class="card">
+                    <div class="ico">💾</div>
+                    <h3>Disk Serials</h3>
+                    <p>Volume IDs, partition IDs and physical disk serials wiped clean. New hardware, zero tells.</p>
+                </div>
+                <div class="card">
+                    <div class="ico">🕹️</div>
+                    <h3>MAC Addresses</h3>
+                    <p>Every NIC (including virtual) spoofed with a randomized MAC that survives reboots.</p>
+                </div>
+                <div class="card">
+                    <div class="ico">🔌</div>
+                    <h3>USB / Network Stacks</h3>
+                    <p>USB serials, Bluetooth device IDs and network adapter identifiers all randomized.</p>
+                </div>
+                <div class="card">
+                    <div class="ico">🧾</div>
+                    <h3>Firmware IDs</h3>
+                    <p>SMBIOS manufacturer + product strings randomized per spoof, ready for fresh Windows builds.</p>
+                </div>
+                <div class="card">
+                    <div class="ico">🛡️</div>
+                    <h3>Anti-Ban Safety</h3>
+                    <p>Smart detection skips VPNs, TAP/TUN and virtual adapters. Only real hardware gets spoofed.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="how">
+            <h2 class="sec-title">SETUP IN <em>60 SECONDS</em></h2>
+            <p class="sec-sub">No manual registry edits. No hex editors. Just hit the button.</p>
+            <div class="steps">
+                <div class="step"><h3>Launch</h3><p>Open the spoofer and hit Full Spoof Sequence.</p></div>
+                <div class="step"><h3>Read</h3><p>It captures your real HWIDs, old vs new.</p></div>
+                <div class="step"><h3>Spoof</h3><p>Random values applied across BIOS, disk, MAC, USB.</p></div>
+                <div class="step"><h3>Verify</h3><p>One-click comparison shows the new state.</p></div>
+            </div>
+        </section>
+
+        <section id="buy">
+            <div class="pricing">
+                <h2 class="sec-title">GET IN THE FIGHT</h2>
+                <div class="price">$10<span> USD</span></div>
+                <div class="per">FULL ACCESS · ALL FUTURE UPDATES INCLUDED</div>
+                <ul class="features-list">
+                    <li>Full Spoof Sequence + Individual Spoofing</li>
+                    <li>Profiles &amp; Backup / Restore</li>
+                    <li>Compare &amp; Verify tab</li>
+                    <li>All component types (BIOS, disk, MAC, USB)</li>
+                    <li>Lifetime updates</li>
+                </ul>
+                <a href="#" class="btn btn-buy" id="paypalBtn">Buy Now — $10</a>
+                <p class="note">Secure checkout · Your private download unlocks automatically the second payment completes</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>HYPER<span style="color:var(--neon)">VOID</span> — Built for players who play dirty. Not affiliated with any game publisher.</p>
+        <p style="margin-top:8px; font-size:12px;">© 2026 HYPERVOID</p>
+    </footer>
+</body>
+</html>

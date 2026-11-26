@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HWID Spoofer v1.0</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --panel2: #1c2129;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --red: #f85149;
+      --purple: #bc8cff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #161b22 0%, #1a2332 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo { display: flex; align-items: center; gap: 14px; }
+    .logo-icon {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      object-fit: contain;
+      background: rgba(88,166,255,0.08);
+      box-shadow: 0 0 18px rgba(188,140,255,0.25);
+    }
+    .logo h1 { font-size: 20px; font-weight: 600; }
+    .logo p { font-size: 12px; color: var(--muted); }
+
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-admin { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+    .status-noadmin { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+
+    .container { padding: 24px 32px; max-width: 1100px; margin: 0 auto; }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .tab {
+      padding: 10px 20px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .card h2 { font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .card h3 { font-size: 14px; color: var(--muted); margin: 16px 0 10px; }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel2);
+      color: var(--text);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .btn:hover { background: #262c36; border-color: var(--accent); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary {
+      background: linear-gradient(135deg, #1f6feb, #388bfd);
+      border-color: #388bfd;
+      color: #fff;
+    }
+    .btn-primary:hover { background: linear-gradient(135deg, #388bfd, #58a6ff); }
+    .btn-danger { border-color: rgba(248,81,73,0.4); color: var(--red); }
+    .btn-danger:hover { background: rgba(248,81,73,0.15); }
+    .btn-success { border-color: rgba(63,185,80,0.4); color: var(--green); }
+    .btn-lg { padding: 14px 28px; font-size: 15px; width: 100%; }
+
+    .btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+    .input-row { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+    }
+    input[type="text"]:focus { outline: none; border-color: var(--accent); }
+
+    .progress-container { margin: 20px 0; display: none; }
+    .progress-container.show { display: block; }
+    .progress-bar-bg {
+      height: 8px;
+      background: var(--bg);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--purple));
+      border-radius: 4px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+    .progress-label { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; }
+
+    .log-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: Consolas, 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 320px;
+      overflow-y: auto;
+      line-height: 1.7;
+    }
+    .log-ok { color: var(--green); }
+    .log-warn { color: var(--yellow); }
+    .log-info { color: var(--accent); }
+    .log-error { color: var(--red); }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .summary-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .summary-item .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .summary-item .value { font-size: 13px; font-family: Consolas, monospace; margin-top: 4px; word-break: break-all; }
+
+    .verify-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .verify-item:last-child { border-bottom: none; }
+    .verify-icon { font-size: 16px; }
+    .verify-name { flex: 1; }
+    .verify-value { font-family: Consolas, monospace; font-size: 12px; color: var(--muted); }
+
+    .profile-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .profile-item .name { flex: 1; font-weight: 500; }
+
+    .note {
+      background: rgba(210,153,34,0.1);
+      border: 1px solid rgba(210,153,34,0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--yellow);
+      margin-top: 16px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Comparison table */
+    .diff-toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .diff-stats { display: flex; gap: 12px; margin-bottom: 16px; }
+    .stat-box {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+    .stat-box .n { font-size: 24px; font-weight: 700; }
+    .stat-box .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-changed .n { color: var(--green); }
+    .stat-same .n { color: var(--muted); }
+
+    .diff-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .diff-table th {
+      text-align: left;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: sticky; top: 0;
+    }
+    .diff-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .diff-table tr.changed { background: rgba(63,185,80,0.05); }
+    .diff-table tr.unchanged { opacity: 0.7; }
+    .diff-cat {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      background: rgba(88,166,255,0.15);
+      color: var(--accent);
+    }
+    .diff-old { color: var(--red); font-family: Consolas, monospace; word-break: break-all; }
+    .diff-new { color: var(--green); font-family: Consolas, monospace; word-break: break-all; }
+    .diff-arrow { color: var(--muted); padding: 0 4px; }
+    .diff-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .badge-changed { background: rgba(63,185,80,0.15); color: var(--green); }
+    .badge-same { background: rgba(139,148,158,0.15); color: var(--muted); }
+    .diff-empty { text-align: center; padding: 40px; color: var(--muted); }
+
+    .toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      padding: 14px 20px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <img src="logo.png" alt="Logo" class="logo-icon">
+    <div>
+      <h1>HWID Spoofer</h1>
+      <p>Randomize hardware identifiers · v1.0</p>
+    </div>
+  </div>
+  <div id="statusBadge" class="status-badge status-noadmin">Checking privileges...</div>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" data-tab="spoof">Full Spoof</button>
+    <button class="tab" data-tab="individual">Individual</button>
+    <button class="tab" data-tab="compare">Compare</button>
+    <button class="tab" data-tab="verify">Verify</button>
+    <button class="tab" data-tab="profiles">Profiles</button>
+  </div>
+
+  <!-- FULL SPOOF TAB -->
+  <div id="tab-spoof" class="tab-content active">
+    <div class="card">
+      <h2>🎯 Full Spoof Sequence</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">
+        Runs all 5 spoofing steps sequentially: BIOS UUID → SMBIOS → Disk Serials → MAC Addresses → USB Serials.
+      </p>
+
+      <div class="input-row">
+        <label style="font-size:13px;color:var(--muted);white-space:nowrap;">Profile name:</label>
+        <input type="text" id="profileName" placeholder="e.g. fresh_machine">
+      </div>
+
+      <button id="btnFullSpoof" class="btn btn-primary btn-lg">▶ Start Full Spoof Sequence</button>
+
+      <div id="progressContainer" class="progress-container">
+        <div class="progress-bar-bg"><div id="progressBar" class="progress-bar"></div></div>
+        <div class="progress-label">
+          <span id="progressLabel">Preparing...</span>
+          <span id="progressStep">0 / 5</span>
+        </div>
+      </div>
+
+      <div id="spoofLog" class="log-panel" style="margin-top:20px;display:none;"></div>
+
+      <div id="spoofSummary" style="display:none;margin-top:20px;">
+        <h3>Verification Summary</h3>
+        <div id="summaryGrid" class="summary-grid"></div>
+        <div id="spoofDiffContainer" style="margin-top:20px;"></div>
+        <button id="btnViewFullDiff" class="btn" style="margin-top:12px;">🔀 View Full Comparison →</button>
+        <div class="note">
+          ⚠ Reboot recommended for all changes to take effect. Then connect to a VPN for a clean, unflagged IP address.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INDIVIDUAL TAB -->
+  <div id="tab-individual" class="tab-content">
+    <div class="card">
+      <h2>🔧 Individual Component Spoofing</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">
+        Spoof specific hardware identifiers one at a time.
+      </p>
+      <div class="btn-grid">
+        <button class="btn" data-spoof="bios"> BIOS UUID</button>
+        <button class="btn" data-spoof="smbios"> SMBIOS Fields</button>
+        <button class="btn" data-spoof="disks"> Disk Drive Serials</button>
+        <button class="btn" data-spoof="network"> Network MAC Addresses</button>
+        <button class="btn" data-spoof="usb"> USB Device Serials</button>
+      </div>
+      <div id="individualLog" class="log-panel" style="margin-top:20px;"></div>
+    </div>
+  </div>
+
+  <!-- COMPARE TAB -->
+  <div id="tab-compare" class="tab-content">
+    <div class="card">
+      <h2>🔀 Compare Old vs New HWID</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">
+        Capture a snapshot of your current identifiers <b>before</b> spoofing, then compare after to see exactly what changed.
+      </p>
+      <div class="diff-toolbar">
+        <button id="btnSnapshot" class="btn btn-success">📸 Capture Baseline Snapshot</button>
+        <button id="btnCompare" class="btn btn-primary">🔀 Compare Now</button>
+        <span id="snapshotTime" style="font-size:12px;color:var(--muted);"></span>
+      </div>
+      <div id="compareStats" class="diff-stats" style="display:none;"></div>
+      <div id="compareResults" style="max-height:420px;overflow-y:auto;"></div>
+      <div class="note">
+        ℹ️ The Full Spoof Sequence automatically saves a baseline before it starts. You can also capture one manually here.
+      </div>
+    </div>
+  </div>
+
+  <!-- VERIFY TAB -->
+  <div id="tab-verify" class="tab-content">
+    <div class="card">
+      <h2>✅ Verify Spoofing Status</h2>
+      <button id="btnVerify" class="btn btn-primary">Refresh Verification</button>
+      <div id="verifyResults" style="margin-top:20px;"></div>
+      <div class="note">
+        ℹ️ A randomized BIOS UUID will show UUID v4 format. A randomized MAC will show "locally administered" status.
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILES TAB -->
+  <div id="tab-profiles" class="tab-content">
+    <div class="card">
+      <h2>💾 Backup & Restore</h2>
+      <div class="input-row">
+        <input type="text" id="backupName" placeholder="Profile name (e.g. original)">
+        <button id="btnBackup" class="btn btn-success">Backup</button>
+      </div>
+      <h3>Saved Profiles</h3>
+      <div id="profilesList"></div>
+      <button id="btnOpenFolder" class="btn" style="margin-top:12px;">📁 Open Profiles Folder</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="renderer.js"></script>
+</body>
+</html>
